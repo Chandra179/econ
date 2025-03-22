@@ -1,11 +1,8 @@
 package stock
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-	"net/url"
-	"os"
+	"stock/common"
+	"stock/config"
 )
 
 /*
@@ -39,16 +36,14 @@ type TimeSeriesParams struct {
 
 // GetTimeSeries fetches time series data from Alpha Vantage API
 func GetTimeSeries(params TimeSeriesParams) (map[string]interface{}, error) {
-	baseURL := "https://www.alphavantage.co/query"
-
-	// Get API key from environment
-	apiKey := getAPIKeyFromEnv()
+	// Get API configuration
+	cfg := config.GetConfig()
 
 	// Building query parameters
 	queryParams := map[string]string{
 		"function": params.Function,
 		"symbol":   params.Symbol,
-		"apikey":   apiKey,
+		"apikey":   cfg.AlphaVantageAPIKey,
 	}
 
 	// Add optional parameters if provided
@@ -82,86 +77,10 @@ func GetTimeSeries(params TimeSeriesParams) (map[string]interface{}, error) {
 	}
 
 	// Make HTTP request and parse response
-	resp, err := MakeAPIRequest(baseURL, queryParams)
+	resp, err := common.MakeAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
 	if err != nil {
 		return nil, err
 	}
 
 	return resp, nil
-}
-
-// MakeAPIRequest performs the HTTP request to Alpha Vantage
-func MakeAPIRequest(baseURL string, params map[string]string) (map[string]interface{}, error) {
-	client := &http.Client{}
-
-	// Build URL with query parameters
-	url, err := buildRequestURL(baseURL, params)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create request
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	// Execute request
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// Parse JSON response
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-// buildRequestURL builds the complete URL with query parameters
-func buildRequestURL(baseURL string, params map[string]string) (string, error) {
-	u, err := url.Parse(baseURL)
-	if err != nil {
-		return "", err
-	}
-
-	q := u.Query()
-	for key, value := range params {
-		q.Set(key, value)
-	}
-
-	u.RawQuery = q.Encode()
-	return u.String(), nil
-}
-
-// getAPIKeyFromEnv gets the Alpha Vantage API key from environment
-func getAPIKeyFromEnv() string {
-	apiKey := os.Getenv("ALPHAVANTAGE_API_KEY")
-	if apiKey == "" {
-		// Fallback to "demo" if not set
-		apiKey = "demo"
-	}
-	return apiKey
-}
-
-func getTimeSeries() {
-	// Example usage:
-	params := TimeSeriesParams{
-		Function:   "TIME_SERIES_DAILY",
-		Symbol:     "IBM",
-		OutputSize: "compact",
-		DataType:   "json",
-	}
-
-	data, err := GetTimeSeries(params)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	fmt.Println("Data retrieved successfully:", data)
 }

@@ -1,14 +1,17 @@
-package api
+package config
 
 import (
 	"os"
 	"sync"
 )
 
-// Config holds configuration values for the API
+// Config holds all configuration settings for the application
 type Config struct {
-	AlphaVantageAPIKey string
-	DefaultVersion     string
+	// API settings
+	AlphaVantageAPIKey  string
+	AlphaVantageBaseURL string
+	DefaultAPIVersion   string
+	Port                string
 }
 
 var (
@@ -20,8 +23,10 @@ var (
 func GetConfig() *Config {
 	configOnce.Do(func() {
 		config = &Config{
-			AlphaVantageAPIKey: getEnvWithDefault("ALPHAVANTAGE_API_KEY", "demo"),
-			DefaultVersion:     getEnvWithDefault("API_DEFAULT_VERSION", "1.0"),
+			AlphaVantageAPIKey:  getEnvWithDefault("ALPHAVANTAGE_API_KEY", "demo"),
+			AlphaVantageBaseURL: "https://www.alphavantage.co/query",
+			DefaultAPIVersion:   getEnvWithDefault("API_DEFAULT_VERSION", "1.0"),
+			Port:                getEnvWithDefault("PORT", "8080"),
 		}
 	})
 	return config

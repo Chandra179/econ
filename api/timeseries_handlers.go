@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"stock/config"
 	"stock/stock"
 
 	"github.com/gin-gonic/gin"
@@ -69,7 +70,7 @@ func GetTimeSeriesForSymbol(c *gin.Context) {
 
 	// Create response with versioning
 	response := TimeSeriesResponse{
-		Version:   GetConfig().DefaultVersion,
+		Version:   config.GetConfig().DefaultAPIVersion,
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Symbol:    symbol,
 		Data:      data,
@@ -139,7 +140,7 @@ func GetTimeSeriesWithInterval(c *gin.Context) {
 
 	// Create response with versioning
 	response := TimeSeriesResponse{
-		Version:   GetConfig().DefaultVersion,
+		Version:   config.GetConfig().DefaultAPIVersion,
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Symbol:    symbol,
 		Interval:  interval,

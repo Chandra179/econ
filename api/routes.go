@@ -30,6 +30,13 @@ func SetupRouter() *gin.Engine {
 			timeseries.GET("/:symbol", GetTimeSeriesForSymbol)
 			timeseries.GET("/:symbol/:interval", GetTimeSeriesWithInterval)
 		}
+
+		// Fundamental data endpoints
+		fundamental := v1.Group("/fundamental")
+		{
+			fundamental.GET("/balance-sheet/:symbol", GetBalanceSheet)
+			fundamental.GET("/cash-flow/:symbol", GetCashFlow)
+		}
 	}
 
 	return router
