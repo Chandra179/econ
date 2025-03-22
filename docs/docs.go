@@ -94,6 +94,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/fundamental/income-statement/{symbol}": {
+            "get": {
+                "description": "Returns the income statement data for the specified stock symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fundamental"
+                ],
+                "summary": "Get income statement data for a specific symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/api.IncomeStatementResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/timeseries/{symbol}": {
             "get": {
                 "description": "Returns time series data for the specified stock symbol",
@@ -282,6 +318,24 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/fundamental.CashFlowResponse"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.IncomeStatementResponse": {
+            "description": "Income statement response data structure",
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/fundamental.IncomeStatementResponse"
                 },
                 "symbol": {
                     "type": "string"
@@ -560,6 +614,109 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/fundamental.CashFlowReport"
+                    }
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "fundamental.IncomeStatementReport": {
+            "type": "object",
+            "properties": {
+                "comprehensiveIncomeNetOfTax": {
+                    "type": "string"
+                },
+                "costOfRevenue": {
+                    "type": "string"
+                },
+                "costofGoodsAndServicesSold": {
+                    "type": "string"
+                },
+                "depreciation": {
+                    "type": "string"
+                },
+                "depreciationAndAmortization": {
+                    "type": "string"
+                },
+                "ebit": {
+                    "type": "string"
+                },
+                "ebitda": {
+                    "type": "string"
+                },
+                "fiscalDateEnding": {
+                    "type": "string"
+                },
+                "grossProfit": {
+                    "type": "string"
+                },
+                "incomeBeforeTax": {
+                    "type": "string"
+                },
+                "incomeTaxExpense": {
+                    "type": "string"
+                },
+                "interestAndDebtExpense": {
+                    "type": "string"
+                },
+                "interestExpense": {
+                    "type": "string"
+                },
+                "interestIncome": {
+                    "type": "string"
+                },
+                "investmentIncomeNet": {
+                    "type": "string"
+                },
+                "netIncome": {
+                    "type": "string"
+                },
+                "netIncomeFromContinuingOperations": {
+                    "type": "string"
+                },
+                "netInterestIncome": {
+                    "type": "string"
+                },
+                "nonInterestIncome": {
+                    "type": "string"
+                },
+                "operatingExpenses": {
+                    "type": "string"
+                },
+                "operatingIncome": {
+                    "type": "string"
+                },
+                "otherNonOperatingIncome": {
+                    "type": "string"
+                },
+                "reportedCurrency": {
+                    "type": "string"
+                },
+                "researchAndDevelopment": {
+                    "type": "string"
+                },
+                "sellingGeneralAndAdministrative": {
+                    "type": "string"
+                },
+                "totalRevenue": {
+                    "type": "string"
+                }
+            }
+        },
+        "fundamental.IncomeStatementResponse": {
+            "type": "object",
+            "properties": {
+                "annualReports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fundamental.IncomeStatementReport"
+                    }
+                },
+                "quarterlyReports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fundamental.IncomeStatementReport"
                     }
                 },
                 "symbol": {

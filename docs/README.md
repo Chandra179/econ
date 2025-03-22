@@ -26,17 +26,6 @@ This provides an interactive documentation where you can:
 - See request/response examples
 - View detailed parameter information
 
-## API Endpoints
-
-### Time Series Endpoints
-1. **GET /api/v1/timeseries/{symbol}**
-   - Gets time series data for a specific stock symbol
-   - Supports daily, weekly, and monthly data
-
-2. **GET /api/v1/timeseries/{symbol}/{interval}**
-   - Gets intraday time series data with a specific interval
-   - Supports intervals: 1min, 5min, 15min, 30min, 60min
-
 ## Updating Documentation
 
 If you make changes to the API endpoints, update the annotations in the Go files and regenerate the documentation:

@@ -1,6 +1,10 @@
 package api
 
 import (
+	"log"
+	"os"
+	"os/exec"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -36,8 +40,20 @@ func SetupRouter() *gin.Engine {
 		{
 			fundamental.GET("/balance-sheet/:symbol", GetBalanceSheet)
 			fundamental.GET("/cash-flow/:symbol", GetCashFlow)
+			fundamental.GET("/income-statement/:symbol", GetIncomeStatement)
 		}
 	}
 
 	return router
+}
+
+func init() {
+	// Only in development mode
+	if os.Getenv("GO_ENV") == "development" {
+		cmd := exec.Command("swag", "init", "-g", "api/routes.go", "-o", "docs")
+		err := cmd.Run()
+		if err != nil {
+			log.Println("Warning: Swagger docs generation failed:", err)
+		}
+	}
 }

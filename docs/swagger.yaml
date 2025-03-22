@@ -24,6 +24,18 @@ definitions:
       version:
         type: string
     type: object
+  api.IncomeStatementResponse:
+    description: Income statement response data structure
+    properties:
+      data:
+        $ref: '#/definitions/fundamental.IncomeStatementResponse'
+      symbol:
+        type: string
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
   api.TimeSeriesResponse:
     description: Time series response data structure
     properties:
@@ -205,6 +217,74 @@ definitions:
       symbol:
         type: string
     type: object
+  fundamental.IncomeStatementReport:
+    properties:
+      comprehensiveIncomeNetOfTax:
+        type: string
+      costOfRevenue:
+        type: string
+      costofGoodsAndServicesSold:
+        type: string
+      depreciation:
+        type: string
+      depreciationAndAmortization:
+        type: string
+      ebit:
+        type: string
+      ebitda:
+        type: string
+      fiscalDateEnding:
+        type: string
+      grossProfit:
+        type: string
+      incomeBeforeTax:
+        type: string
+      incomeTaxExpense:
+        type: string
+      interestAndDebtExpense:
+        type: string
+      interestExpense:
+        type: string
+      interestIncome:
+        type: string
+      investmentIncomeNet:
+        type: string
+      netIncome:
+        type: string
+      netIncomeFromContinuingOperations:
+        type: string
+      netInterestIncome:
+        type: string
+      nonInterestIncome:
+        type: string
+      operatingExpenses:
+        type: string
+      operatingIncome:
+        type: string
+      otherNonOperatingIncome:
+        type: string
+      reportedCurrency:
+        type: string
+      researchAndDevelopment:
+        type: string
+      sellingGeneralAndAdministrative:
+        type: string
+      totalRevenue:
+        type: string
+    type: object
+  fundamental.IncomeStatementResponse:
+    properties:
+      annualReports:
+        items:
+          $ref: '#/definitions/fundamental.IncomeStatementReport'
+        type: array
+      quarterlyReports:
+        items:
+          $ref: '#/definitions/fundamental.IncomeStatementReport'
+        type: array
+      symbol:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -263,6 +343,30 @@ paths:
             additionalProperties: true
             type: object
       summary: Get cash flow data for a specific symbol
+      tags:
+      - fundamental
+  /api/v1/fundamental/income-statement/{symbol}:
+    get:
+      description: Returns the income statement data for the specified stock symbol
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/api.IncomeStatementResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get income statement data for a specific symbol
       tags:
       - fundamental
   /api/v1/timeseries/{symbol}:
