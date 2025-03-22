@@ -41,6 +41,7 @@ func SetupRouter() *gin.Engine {
 			fundamental.GET("/balance-sheet/:symbol", GetBalanceSheet)
 			fundamental.GET("/cash-flow/:symbol", GetCashFlow)
 			fundamental.GET("/income-statement/:symbol", GetIncomeStatement)
+			fundamental.GET("/company-overview/:symbol", GetCompanyOverview)
 		}
 	}
 

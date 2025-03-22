@@ -91,6 +91,42 @@
                 }
             }
         },
+        "/api/v1/fundamental/company-overview/{symbol}": {
+            "get": {
+                "description": "Returns the company overview data for the specified stock symbol (sector, industry, PE ratio, EBITDA, and more)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fundamental"
+                ],
+                "summary": "Get company overview data for a specific symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/api.CompanyOverviewResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/fundamental/income-statement/{symbol}": {
             "get": {
                 "description": "Returns the income statement data for the specified stock symbol",
@@ -315,6 +351,24 @@
             "properties": {
                 "data": {
                     "$ref": "#/definitions/fundamental.CashFlowResponse"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.CompanyOverviewResponse": {
+            "description": "Company overview response data structure",
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/fundamental.CompanyOverviewResponse"
                 },
                 "symbol": {
                     "type": "string"
@@ -614,6 +668,182 @@
                     }
                 },
                 "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "fundamental.CompanyOverviewResponse": {
+            "type": "object",
+            "properties": {
+                "200DayMovingAverage": {
+                    "type": "string"
+                },
+                "50DayMovingAverage": {
+                    "type": "string"
+                },
+                "52WeekHigh": {
+                    "type": "string"
+                },
+                "52WeekLow": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "analystTargetPrice": {
+                    "type": "string"
+                },
+                "beta": {
+                    "type": "string"
+                },
+                "bookValue": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dilutedEPSTTM": {
+                    "type": "string"
+                },
+                "dividendDate": {
+                    "type": "string"
+                },
+                "dividendPerShare": {
+                    "type": "string"
+                },
+                "dividendYield": {
+                    "type": "string"
+                },
+                "ebitda": {
+                    "type": "string"
+                },
+                "eps": {
+                    "type": "string"
+                },
+                "evToEBITDA": {
+                    "type": "string"
+                },
+                "evToRevenue": {
+                    "type": "string"
+                },
+                "exDividendDate": {
+                    "type": "string"
+                },
+                "exchange": {
+                    "type": "string"
+                },
+                "fiscalYearEnd": {
+                    "type": "string"
+                },
+                "forwardAnnualDividendRate": {
+                    "type": "string"
+                },
+                "forwardAnnualDividendYield": {
+                    "type": "string"
+                },
+                "forwardPE": {
+                    "type": "string"
+                },
+                "grossProfitTTM": {
+                    "type": "string"
+                },
+                "industry": {
+                    "type": "string"
+                },
+                "lastSplitDate": {
+                    "type": "string"
+                },
+                "lastSplitFactor": {
+                    "type": "string"
+                },
+                "latestQuarter": {
+                    "type": "string"
+                },
+                "marketCapitalization": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operatingMarginTTM": {
+                    "type": "string"
+                },
+                "payoutRatio": {
+                    "type": "string"
+                },
+                "peRatio": {
+                    "type": "string"
+                },
+                "pegRatio": {
+                    "type": "string"
+                },
+                "percentInsiders": {
+                    "type": "string"
+                },
+                "percentInstitutions": {
+                    "type": "string"
+                },
+                "priceToBookRatio": {
+                    "type": "string"
+                },
+                "priceToSalesRatioTTM": {
+                    "type": "string"
+                },
+                "profitMargin": {
+                    "type": "string"
+                },
+                "quarterlyEarningsGrowthYOY": {
+                    "type": "string"
+                },
+                "quarterlyRevenueGrowthYOY": {
+                    "type": "string"
+                },
+                "returnOnAssetsTTM": {
+                    "type": "string"
+                },
+                "returnOnEquityTTM": {
+                    "type": "string"
+                },
+                "revenuePerShareTTM": {
+                    "type": "string"
+                },
+                "revenueTTM": {
+                    "type": "string"
+                },
+                "sector": {
+                    "type": "string"
+                },
+                "sharesFloat": {
+                    "type": "string"
+                },
+                "sharesOutstanding": {
+                    "type": "string"
+                },
+                "sharesShort": {
+                    "type": "string"
+                },
+                "sharesShortPriorMonth": {
+                    "type": "string"
+                },
+                "shortPercentFloat": {
+                    "type": "string"
+                },
+                "shortPercentOutstanding": {
+                    "type": "string"
+                },
+                "shortRatio": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "trailingPE": {
                     "type": "string"
                 }
             }
