@@ -1,0 +1,146 @@
+basePath: /
+definitions:
+  api.TimeSeriesResponse:
+    description: Time series response data structure
+    properties:
+      data:
+        additionalProperties: true
+        type: object
+      interval:
+        type: string
+      symbol:
+        type: string
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: admin@example.com
+    name: API Support
+  description: API for retrieving time series data from stock markets
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Stock Market API
+  version: "1.0"
+paths:
+  /api/v1/timeseries/{symbol}:
+    get:
+      description: Returns time series data for the specified stock symbol
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      - default: TIME_SERIES_DAILY
+        description: Time series function
+        enum:
+        - TIME_SERIES_DAILY
+        - TIME_SERIES_WEEKLY
+        - TIME_SERIES_MONTHLY
+        in: query
+        name: function
+        type: string
+      - default: compact
+        description: Amount of data to return
+        enum:
+        - compact
+        - full
+        in: query
+        name: outputsize
+        type: string
+      - default: json
+        description: Data type for response
+        enum:
+        - json
+        - csv
+        in: query
+        name: datatype
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/api.TimeSeriesResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get time series data for a specific symbol
+      tags:
+      - timeseries
+  /api/v1/timeseries/{symbol}/{interval}:
+    get:
+      description: Returns intraday time series data with the specified interval
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      - description: Time interval for data
+        enum:
+        - 1min
+        - 5min
+        - 15min
+        - 30min
+        - 60min
+        in: path
+        name: interval
+        required: true
+        type: string
+      - default: compact
+        description: Amount of data to return
+        enum:
+        - compact
+        - full
+        in: query
+        name: outputsize
+        type: string
+      - default: json
+        description: Data type for response
+        enum:
+        - json
+        - csv
+        in: query
+        name: datatype
+        type: string
+      - default: false
+        description: Whether to include extended hours data
+        in: query
+        name: extended_hours
+        type: boolean
+      - default: true
+        description: Whether to adjust for split and dividend events
+        in: query
+        name: adjusted
+        type: boolean
+      - description: Month for historical intraday data (YYYY-MM format)
+        in: query
+        name: month
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/api.TimeSeriesResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get intraday time series data with specific interval
+      tags:
+      - timeseries
+schemes:
+- http
+swagger: "2.0"
