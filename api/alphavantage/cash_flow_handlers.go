@@ -1,10 +1,9 @@
-package api
+package alphavantage
 
 import (
 	"net/http"
+	"stock/api/alphavantage/fundamental"
 	"time"
-
-	"stock/stock/fundamental"
 
 	"github.com/gin-gonic/gin"
 )

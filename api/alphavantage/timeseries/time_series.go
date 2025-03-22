@@ -1,4 +1,4 @@
-package stock
+package timeseries
 
 import (
 	"stock/common"

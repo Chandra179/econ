@@ -1,12 +1,12 @@
-package api
+package alphavantage
 
 import (
 	"net/http"
 	"strconv"
 	"time"
 
+	"stock/api/alphavantage/timeseries"
 	"stock/config"
-	"stock/stock"
 
 	"github.com/gin-gonic/gin"
 )
@@ -153,7 +153,7 @@ func GetTimeSeriesWithInterval(c *gin.Context) {
 // getTimeSeriesData fetches time series data from Alpha Vantage API
 func getTimeSeriesData(params TimeSeriesParams) (map[string]interface{}, error) {
 	// Convert API params to stock package params
-	stockParams := stock.TimeSeriesParams{
+	stockParams := timeseries.TimeSeriesParams{
 		Function:      params.Function,
 		Symbol:        params.Symbol,
 		Interval:      params.Interval,
@@ -164,10 +164,9 @@ func getTimeSeriesData(params TimeSeriesParams) (map[string]interface{}, error) 
 	}
 
 	// Only set Adjusted if it's not the default value (true)
-	// The stock.GetTimeSeries function will only include the adjusted parameter
+	// The timeseries.GetTimeSeries function will only include the adjusted parameter
 	// in the API call if it's explicitly set to false
 	stockParams.Adjusted = params.Adjusted
-
 	// Use the library function directly
-	return stock.GetTimeSeries(stockParams)
+	return timeseries.GetTimeSeries(stockParams)
 }

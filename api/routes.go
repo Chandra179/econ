@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"stock/api/alphavantage"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -31,17 +32,17 @@ func SetupRouter() *gin.Engine {
 		// Time series endpoints
 		timeseries := v1.Group("/timeseries")
 		{
-			timeseries.GET("/:symbol", GetTimeSeriesForSymbol)
-			timeseries.GET("/:symbol/:interval", GetTimeSeriesWithInterval)
+			timeseries.GET("/:symbol", alphavantage.GetTimeSeriesForSymbol)
+			timeseries.GET("/:symbol/:interval", alphavantage.GetTimeSeriesWithInterval)
 		}
 
 		// Fundamental data endpoints
 		fundamental := v1.Group("/fundamental")
 		{
-			fundamental.GET("/balance-sheet/:symbol", GetBalanceSheet)
-			fundamental.GET("/cash-flow/:symbol", GetCashFlow)
-			fundamental.GET("/income-statement/:symbol", GetIncomeStatement)
-			fundamental.GET("/company-overview/:symbol", GetCompanyOverview)
+			fundamental.GET("/balance-sheet/:symbol", alphavantage.GetBalanceSheet)
+			fundamental.GET("/cash-flow/:symbol", alphavantage.GetCashFlow)
+			fundamental.GET("/income-statement/:symbol", alphavantage.GetIncomeStatement)
+			fundamental.GET("/company-overview/:symbol", alphavantage.GetCompanyOverview)
 		}
 	}
 

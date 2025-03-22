@@ -1,4 +1,4 @@
-package stock
+package search
 
 /*
 	by keyword
