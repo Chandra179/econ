@@ -22,220 +22,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/fundamental/balance-sheet/{symbol}": {
-            "get": {
-                "description": "Returns the balance sheet data for the specified stock symbol",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "fundamental"
-                ],
-                "summary": "Get balance sheet data for a specific symbol",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stock symbol (e.g., AAPL, MSFT)",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/api.BalanceSheetResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/fundamental/cash-flow/{symbol}": {
-            "get": {
-                "description": "Returns the cash flow data for the specified stock symbol",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "fundamental"
-                ],
-                "summary": "Get cash flow data for a specific symbol",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stock symbol (e.g., AAPL, MSFT)",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/api.CashFlowResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/fundamental/company-overview/{symbol}": {
-            "get": {
-                "description": "Returns the company overview data for the specified stock symbol (sector, industry, PE ratio, EBITDA, and more)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "fundamental"
-                ],
-                "summary": "Get company overview data for a specific symbol",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stock symbol (e.g., AAPL, MSFT)",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/api.CompanyOverviewResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/fundamental/income-statement/{symbol}": {
-            "get": {
-                "description": "Returns the income statement data for the specified stock symbol",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "fundamental"
-                ],
-                "summary": "Get income statement data for a specific symbol",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stock symbol (e.g., AAPL, MSFT)",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/api.IncomeStatementResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/timeseries/{symbol}": {
-            "get": {
-                "description": "Returns time series data for the specified stock symbol",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "timeseries"
-                ],
-                "summary": "Get time series data for a specific symbol",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stock symbol (e.g., AAPL, MSFT)",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "enum": [
-                            "TIME_SERIES_DAILY",
-                            "TIME_SERIES_WEEKLY",
-                            "TIME_SERIES_MONTHLY"
-                        ],
-                        "type": "string",
-                        "default": "TIME_SERIES_DAILY",
-                        "description": "Time series function",
-                        "name": "function",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "compact",
-                            "full"
-                        ],
-                        "type": "string",
-                        "default": "compact",
-                        "description": "Amount of data to return",
-                        "name": "outputsize",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "json",
-                            "csv"
-                        ],
-                        "type": "string",
-                        "default": "json",
-                        "description": "Data type for response",
-                        "name": "datatype",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/api.TimeSeriesResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/timeseries/{symbol}/{interval}": {
             "get": {
                 "description": "Returns intraday time series data with the specified interval",
@@ -315,7 +101,346 @@ const docTemplate = `{
                     "200": {
                         "description": "Successful operation",
                         "schema": {
-                            "$ref": "#/definitions/api.TimeSeriesResponse"
+                            "$ref": "#/definitions/alphavantage.TimeSeriesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/filereader/readbytes": {
+            "post": {
+                "description": "Reads and parses file data (CSV or PDF) from the request body and returns structured data",
+                "consumes": [
+                    "application/octet-stream"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "filereader"
+                ],
+                "summary": "Read and parse file data from request body",
+                "parameters": [
+                    {
+                        "enum": [
+                            "csv",
+                            "pdf"
+                        ],
+                        "type": "string",
+                        "description": "File type (csv or pdf)",
+                        "name": "fileType",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Original filename (for reference only)",
+                        "name": "filename",
+                        "in": "query"
+                    },
+                    {
+                        "description": "Raw file content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/filereader.FileReadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/filereader/upload": {
+            "post": {
+                "description": "Reads and parses an uploaded file (CSV or PDF) and returns structured data",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "filereader"
+                ],
+                "summary": "Read and parse an uploaded file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "File to be parsed",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "csv",
+                            "pdf"
+                        ],
+                        "type": "string",
+                        "description": "File type (csv or pdf)",
+                        "name": "fileType",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/filereader.FileReadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/fundamental/balance-sheet/{symbol}": {
+            "get": {
+                "description": "Returns the balance sheet data for the specified stock symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fundamental"
+                ],
+                "summary": "Get balance sheet data for a specific symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/alphavantage.BalanceSheetResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/fundamental/cash-flow/{symbol}": {
+            "get": {
+                "description": "Returns the cash flow data for the specified stock symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fundamental"
+                ],
+                "summary": "Get cash flow data for a specific symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/alphavantage.CashFlowResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/fundamental/company-overview/{symbol}": {
+            "get": {
+                "description": "Returns the company overview data for the specified stock symbol (sector, industry, PE ratio, EBITDA, and more)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fundamental"
+                ],
+                "summary": "Get company overview data for a specific symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/alphavantage.CompanyOverviewResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/fundamental/income-statement/{symbol}": {
+            "get": {
+                "description": "Returns the income statement data for the specified stock symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fundamental"
+                ],
+                "summary": "Get income statement data for a specific symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/alphavantage.IncomeStatementResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/timeseries/{symbol}": {
+            "get": {
+                "description": "Returns time series data for the specified stock symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "timeseries"
+                ],
+                "summary": "Get time series data for a specific symbol",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "TIME_SERIES_DAILY",
+                            "TIME_SERIES_WEEKLY",
+                            "TIME_SERIES_MONTHLY"
+                        ],
+                        "type": "string",
+                        "default": "TIME_SERIES_DAILY",
+                        "description": "Time series function",
+                        "name": "function",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "compact",
+                            "full"
+                        ],
+                        "type": "string",
+                        "default": "compact",
+                        "description": "Amount of data to return",
+                        "name": "outputsize",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "json",
+                            "csv"
+                        ],
+                        "type": "string",
+                        "default": "json",
+                        "description": "Data type for response",
+                        "name": "datatype",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/alphavantage.TimeSeriesResponse"
                         }
                     },
                     "500": {
@@ -330,7 +455,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.BalanceSheetResponse": {
+        "alphavantage.BalanceSheetResponse": {
             "description": "Balance sheet response data structure",
             "type": "object",
             "properties": {
@@ -348,7 +473,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.CashFlowResponse": {
+        "alphavantage.CashFlowResponse": {
             "description": "Cash flow response data structure",
             "type": "object",
             "properties": {
@@ -366,7 +491,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.CompanyOverviewResponse": {
+        "alphavantage.CompanyOverviewResponse": {
             "description": "Company overview response data structure",
             "type": "object",
             "properties": {
@@ -384,7 +509,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.IncomeStatementResponse": {
+        "alphavantage.IncomeStatementResponse": {
             "description": "Income statement response data structure",
             "type": "object",
             "properties": {
@@ -402,7 +527,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.TimeSeriesResponse": {
+        "alphavantage.TimeSeriesResponse": {
             "description": "Time series response data structure",
             "type": "object",
             "properties": {
@@ -415,6 +540,42 @@ const docTemplate = `{
                 },
                 "symbol": {
                     "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "filereader.FileReadResponse": {
+            "description": "File read response data structure",
+            "type": "object",
+            "properties": {
+                "columnsMax": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "error": {
+                    "type": "string"
+                },
+                "fileType": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "rowsCount": {
+                    "type": "integer"
                 },
                 "timestamp": {
                     "type": "string"

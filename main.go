@@ -2,10 +2,15 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/exec"
+	"stock/alphavantage"
+	"stock/filereader"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"stock/api"
 	"stock/config"
 
 	// Swagger docs
@@ -38,7 +43,7 @@ func main() {
 	cfg := config.GetConfig()
 
 	// Setup router
-	router := api.SetupRouter()
+	router := SetupRouter()
 
 	// Setup Swagger endpoints
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -48,5 +53,59 @@ func main() {
 	log.Printf("Swagger UI available at http://localhost:%s/swagger/index.html\n", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
+	}
+}
+
+// SetupRouter initializes the Gin router with API routes
+func SetupRouter() *gin.Engine {
+	router := gin.Default()
+
+	// Configure CORS
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
+	// API versioning
+	v1 := router.Group("/v1")
+	{
+		// Time series endpoints
+		timeseries := v1.Group("/timeseries")
+		{
+			timeseries.GET("/:symbol", alphavantage.GetTimeSeriesForSymbol)
+			timeseries.GET("/:symbol/:interval", alphavantage.GetTimeSeriesWithInterval)
+		}
+
+		// Fundamental data endpoints
+		fundamental := v1.Group("/fundamental")
+		{
+			fundamental.GET("/balance-sheet/:symbol", alphavantage.GetBalanceSheet)
+			fundamental.GET("/cash-flow/:symbol", alphavantage.GetCashFlow)
+			fundamental.GET("/income-statement/:symbol", alphavantage.GetIncomeStatement)
+			fundamental.GET("/company-overview/:symbol", alphavantage.GetCompanyOverview)
+		}
+
+		// File reader endpoints
+		fileReader := v1.Group("/filereader")
+		{
+			fileReader.POST("/upload", filereader.ReadFileFromUpload)
+			fileReader.POST("/readbytes", filereader.ReadFileFromBytes)
+		}
+	}
+
+	return router
+}
+
+func init() {
+	// Only in development mode
+	if os.Getenv("GO_ENV") == "development" {
+		cmd := exec.Command("swag", "init", "-g", "main.go", "-o", "docs")
+		err := cmd.Run()
+		if err != nil {
+			log.Println("Warning: Swagger docs generation failed:", err)
+		}
 	}
 }

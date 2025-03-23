@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  api.BalanceSheetResponse:
+  alphavantage.BalanceSheetResponse:
     description: Balance sheet response data structure
     properties:
       data:
@@ -12,7 +12,7 @@ definitions:
       version:
         type: string
     type: object
-  api.CashFlowResponse:
+  alphavantage.CashFlowResponse:
     description: Cash flow response data structure
     properties:
       data:
@@ -24,7 +24,7 @@ definitions:
       version:
         type: string
     type: object
-  api.CompanyOverviewResponse:
+  alphavantage.CompanyOverviewResponse:
     description: Company overview response data structure
     properties:
       data:
@@ -36,7 +36,7 @@ definitions:
       version:
         type: string
     type: object
-  api.IncomeStatementResponse:
+  alphavantage.IncomeStatementResponse:
     description: Income statement response data structure
     properties:
       data:
@@ -48,7 +48,7 @@ definitions:
       version:
         type: string
     type: object
-  api.TimeSeriesResponse:
+  alphavantage.TimeSeriesResponse:
     description: Time series response data structure
     properties:
       data:
@@ -58,6 +58,30 @@ definitions:
         type: string
       symbol:
         type: string
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
+  filereader.FileReadResponse:
+    description: File read response data structure
+    properties:
+      columnsMax:
+        type: integer
+      data:
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+      error:
+        type: string
+      fileType:
+        type: string
+      filename:
+        type: string
+      rowsCount:
+        type: integer
       timestamp:
         type: string
       version:
@@ -426,152 +450,6 @@ info:
   title: Stock Market API
   version: "1.0"
 paths:
-  /api/v1/fundamental/balance-sheet/{symbol}:
-    get:
-      description: Returns the balance sheet data for the specified stock symbol
-      parameters:
-      - description: Stock symbol (e.g., AAPL, MSFT)
-        in: path
-        name: symbol
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/api.BalanceSheetResponse'
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get balance sheet data for a specific symbol
-      tags:
-      - fundamental
-  /api/v1/fundamental/cash-flow/{symbol}:
-    get:
-      description: Returns the cash flow data for the specified stock symbol
-      parameters:
-      - description: Stock symbol (e.g., AAPL, MSFT)
-        in: path
-        name: symbol
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/api.CashFlowResponse'
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get cash flow data for a specific symbol
-      tags:
-      - fundamental
-  /api/v1/fundamental/company-overview/{symbol}:
-    get:
-      description: Returns the company overview data for the specified stock symbol
-        (sector, industry, PE ratio, EBITDA, and more)
-      parameters:
-      - description: Stock symbol (e.g., AAPL, MSFT)
-        in: path
-        name: symbol
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/api.CompanyOverviewResponse'
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get company overview data for a specific symbol
-      tags:
-      - fundamental
-  /api/v1/fundamental/income-statement/{symbol}:
-    get:
-      description: Returns the income statement data for the specified stock symbol
-      parameters:
-      - description: Stock symbol (e.g., AAPL, MSFT)
-        in: path
-        name: symbol
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/api.IncomeStatementResponse'
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get income statement data for a specific symbol
-      tags:
-      - fundamental
-  /api/v1/timeseries/{symbol}:
-    get:
-      description: Returns time series data for the specified stock symbol
-      parameters:
-      - description: Stock symbol (e.g., AAPL, MSFT)
-        in: path
-        name: symbol
-        required: true
-        type: string
-      - default: TIME_SERIES_DAILY
-        description: Time series function
-        enum:
-        - TIME_SERIES_DAILY
-        - TIME_SERIES_WEEKLY
-        - TIME_SERIES_MONTHLY
-        in: query
-        name: function
-        type: string
-      - default: compact
-        description: Amount of data to return
-        enum:
-        - compact
-        - full
-        in: query
-        name: outputsize
-        type: string
-      - default: json
-        description: Data type for response
-        enum:
-        - json
-        - csv
-        in: query
-        name: datatype
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/api.TimeSeriesResponse'
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get time series data for a specific symbol
-      tags:
-      - timeseries
   /api/v1/timeseries/{symbol}/{interval}:
     get:
       description: Returns intraday time series data with the specified interval
@@ -628,13 +506,246 @@ paths:
         "200":
           description: Successful operation
           schema:
-            $ref: '#/definitions/api.TimeSeriesResponse'
+            $ref: '#/definitions/alphavantage.TimeSeriesResponse'
         "500":
           description: Internal server error
           schema:
             additionalProperties: true
             type: object
       summary: Get intraday time series data with specific interval
+      tags:
+      - timeseries
+  /v1/filereader/readbytes:
+    post:
+      consumes:
+      - application/octet-stream
+      description: Reads and parses file data (CSV or PDF) from the request body and
+        returns structured data
+      parameters:
+      - description: File type (csv or pdf)
+        enum:
+        - csv
+        - pdf
+        in: query
+        name: fileType
+        required: true
+        type: string
+      - description: Original filename (for reference only)
+        in: query
+        name: filename
+        type: string
+      - description: Raw file content
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/filereader.FileReadResponse'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Read and parse file data from request body
+      tags:
+      - filereader
+  /v1/filereader/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Reads and parses an uploaded file (CSV or PDF) and returns structured
+        data
+      parameters:
+      - description: File to be parsed
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: File type (csv or pdf)
+        enum:
+        - csv
+        - pdf
+        in: query
+        name: fileType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/filereader.FileReadResponse'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Read and parse an uploaded file
+      tags:
+      - filereader
+  /v1/fundamental/balance-sheet/{symbol}:
+    get:
+      description: Returns the balance sheet data for the specified stock symbol
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/alphavantage.BalanceSheetResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get balance sheet data for a specific symbol
+      tags:
+      - fundamental
+  /v1/fundamental/cash-flow/{symbol}:
+    get:
+      description: Returns the cash flow data for the specified stock symbol
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/alphavantage.CashFlowResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get cash flow data for a specific symbol
+      tags:
+      - fundamental
+  /v1/fundamental/company-overview/{symbol}:
+    get:
+      description: Returns the company overview data for the specified stock symbol
+        (sector, industry, PE ratio, EBITDA, and more)
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/alphavantage.CompanyOverviewResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get company overview data for a specific symbol
+      tags:
+      - fundamental
+  /v1/fundamental/income-statement/{symbol}:
+    get:
+      description: Returns the income statement data for the specified stock symbol
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/alphavantage.IncomeStatementResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get income statement data for a specific symbol
+      tags:
+      - fundamental
+  /v1/timeseries/{symbol}:
+    get:
+      description: Returns time series data for the specified stock symbol
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      - default: TIME_SERIES_DAILY
+        description: Time series function
+        enum:
+        - TIME_SERIES_DAILY
+        - TIME_SERIES_WEEKLY
+        - TIME_SERIES_MONTHLY
+        in: query
+        name: function
+        type: string
+      - default: compact
+        description: Amount of data to return
+        enum:
+        - compact
+        - full
+        in: query
+        name: outputsize
+        type: string
+      - default: json
+        description: Data type for response
+        enum:
+        - json
+        - csv
+        in: query
+        name: datatype
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/alphavantage.TimeSeriesResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get time series data for a specific symbol
       tags:
       - timeseries
 schemes:
