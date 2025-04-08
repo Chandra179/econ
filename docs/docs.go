@@ -22,98 +22,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/timeseries/{symbol}/{interval}": {
-            "get": {
-                "description": "Returns intraday time series data with the specified interval",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "timeseries"
-                ],
-                "summary": "Get intraday time series data with specific interval",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stock symbol (e.g., AAPL, MSFT)",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "enum": [
-                            "1min",
-                            "5min",
-                            "15min",
-                            "30min",
-                            "60min"
-                        ],
-                        "type": "string",
-                        "description": "Time interval for data",
-                        "name": "interval",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "enum": [
-                            "compact",
-                            "full"
-                        ],
-                        "type": "string",
-                        "default": "compact",
-                        "description": "Amount of data to return",
-                        "name": "outputsize",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "json",
-                            "csv"
-                        ],
-                        "type": "string",
-                        "default": "json",
-                        "description": "Data type for response",
-                        "name": "datatype",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Whether to include extended hours data",
-                        "name": "extended_hours",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "default": true,
-                        "description": "Whether to adjust for split and dividend events",
-                        "name": "adjusted",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Month for historical intraday data (YYYY-MM format)",
-                        "name": "month",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/alphavantage.TimeSeriesResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/v1/fundamental/balance-sheet/{symbol}": {
             "get": {
                 "description": "Returns the balance sheet data for the specified stock symbol",
@@ -258,6 +166,71 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/news/sentiment": {
+            "get": {
+                "description": "Returns news articles and sentiment analysis based on tickers, topics, and time range",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "news"
+                ],
+                "summary": "Get news and sentiment data for specified parameters",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comma-separated list of stock symbols (e.g., AAPL,MSFT)",
+                        "name": "tickers",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated list of topics",
+                        "name": "topics",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start time in YYYYMMDDTHHMM format",
+                        "name": "time_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time in YYYYMMDDTHHMM format",
+                        "name": "time_to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order: LATEST, EARLIEST, or RELEVANCE",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of results (default: 50, max: 1000)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/alphavantage.NewsAndSentimentResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/v1/timeseries/{symbol}": {
             "get": {
                 "description": "Returns time series data for the specified stock symbol",
@@ -308,6 +281,98 @@ const docTemplate = `{
                         "default": "json",
                         "description": "Data type for response",
                         "name": "datatype",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/alphavantage.TimeSeriesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/timeseries/{symbol}/{interval}": {
+            "get": {
+                "description": "Returns intraday time series data with the specified interval",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "timeseries"
+                ],
+                "summary": "Get intraday time series data with specific interval",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol (e.g., AAPL, MSFT)",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "1min",
+                            "5min",
+                            "15min",
+                            "30min",
+                            "60min"
+                        ],
+                        "type": "string",
+                        "description": "Time interval for data",
+                        "name": "interval",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "compact",
+                            "full"
+                        ],
+                        "type": "string",
+                        "default": "compact",
+                        "description": "Amount of data to return",
+                        "name": "outputsize",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "json",
+                            "csv"
+                        ],
+                        "type": "string",
+                        "default": "json",
+                        "description": "Data type for response",
+                        "name": "datatype",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Whether to include extended hours data",
+                        "name": "extended_hours",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Whether to adjust for split and dividend events",
+                        "name": "adjusted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Month for historical intraday data (YYYY-MM format)",
+                        "name": "month",
                         "in": "query"
                     }
                 ],
@@ -393,6 +458,21 @@ const docTemplate = `{
                 },
                 "symbol": {
                     "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "alphavantage.NewsAndSentimentResponse": {
+            "description": "News and sentiment response data structure",
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/news.GetNewsAndSentimentResponse"
                 },
                 "timestamp": {
                     "type": "string"
@@ -949,6 +1029,93 @@ const docTemplate = `{
                     }
                 },
                 "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "news.FeedItem": {
+            "type": "object",
+            "properties": {
+                "authors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "category_within_source": {
+                    "type": "string"
+                },
+                "overall_sentiment_label": {
+                    "type": "string"
+                },
+                "overall_sentiment_score": {
+                    "type": "number"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "source_domain": {
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "ticker_sentiment": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/news.TickerSentiment"
+                    }
+                },
+                "time_published": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "topics": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "news.GetNewsAndSentimentResponse": {
+            "type": "object",
+            "properties": {
+                "feed": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/news.FeedItem"
+                    }
+                },
+                "items": {
+                    "type": "integer"
+                },
+                "relevance_score_definition": {
+                    "type": "string"
+                },
+                "sentiment_score_definition": {
+                    "type": "string"
+                }
+            }
+        },
+        "news.TickerSentiment": {
+            "type": "object",
+            "properties": {
+                "relevance_score": {
+                    "type": "number"
+                },
+                "sentiment_label": {
+                    "type": "string"
+                },
+                "sentiment_score": {
+                    "type": "number"
+                },
+                "ticker": {
                     "type": "string"
                 }
             }

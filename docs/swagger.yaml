@@ -48,6 +48,16 @@ definitions:
       version:
         type: string
     type: object
+  alphavantage.NewsAndSentimentResponse:
+    description: News and sentiment response data structure
+    properties:
+      data:
+        $ref: '#/definitions/news.GetNewsAndSentimentResponse'
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
   alphavantage.TimeSeriesResponse:
     description: Time series response data structure
     properties:
@@ -413,6 +423,63 @@ definitions:
       symbol:
         type: string
     type: object
+  news.FeedItem:
+    properties:
+      authors:
+        items:
+          type: string
+        type: array
+      category_within_source:
+        type: string
+      overall_sentiment_label:
+        type: string
+      overall_sentiment_score:
+        type: number
+      source:
+        type: string
+      source_domain:
+        type: string
+      summary:
+        type: string
+      ticker_sentiment:
+        items:
+          $ref: '#/definitions/news.TickerSentiment'
+        type: array
+      time_published:
+        type: string
+      title:
+        type: string
+      topics:
+        items:
+          type: string
+        type: array
+      url:
+        type: string
+    type: object
+  news.GetNewsAndSentimentResponse:
+    properties:
+      feed:
+        items:
+          $ref: '#/definitions/news.FeedItem'
+        type: array
+      items:
+        type: integer
+      relevance_score_definition:
+        type: string
+      sentiment_score_definition:
+        type: string
+    type: object
+  news.TickerSentiment:
+    properties:
+      relevance_score:
+        type: number
+      sentiment_label:
+        type: string
+      sentiment_score:
+        type: number
+      ticker:
+        type: string
+    type: object
   timeseries.TimeSeriesData:
     properties:
       1. open:
@@ -474,71 +541,6 @@ info:
   title: Stock Market API
   version: "1.0"
 paths:
-  /api/v1/timeseries/{symbol}/{interval}:
-    get:
-      description: Returns intraday time series data with the specified interval
-      parameters:
-      - description: Stock symbol (e.g., AAPL, MSFT)
-        in: path
-        name: symbol
-        required: true
-        type: string
-      - description: Time interval for data
-        enum:
-        - 1min
-        - 5min
-        - 15min
-        - 30min
-        - 60min
-        in: path
-        name: interval
-        required: true
-        type: string
-      - default: compact
-        description: Amount of data to return
-        enum:
-        - compact
-        - full
-        in: query
-        name: outputsize
-        type: string
-      - default: json
-        description: Data type for response
-        enum:
-        - json
-        - csv
-        in: query
-        name: datatype
-        type: string
-      - default: false
-        description: Whether to include extended hours data
-        in: query
-        name: extended_hours
-        type: boolean
-      - default: true
-        description: Whether to adjust for split and dividend events
-        in: query
-        name: adjusted
-        type: boolean
-      - description: Month for historical intraday data (YYYY-MM format)
-        in: query
-        name: month
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/alphavantage.TimeSeriesResponse'
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get intraday time series data with specific interval
-      tags:
-      - timeseries
   /v1/fundamental/balance-sheet/{symbol}:
     get:
       description: Returns the balance sheet data for the specified stock symbol
@@ -636,6 +638,50 @@ paths:
       summary: Get income statement data for a specific symbol
       tags:
       - fundamental
+  /v1/news/sentiment:
+    get:
+      description: Returns news articles and sentiment analysis based on tickers,
+        topics, and time range
+      parameters:
+      - description: Comma-separated list of stock symbols (e.g., AAPL,MSFT)
+        in: query
+        name: tickers
+        type: string
+      - description: Comma-separated list of topics
+        in: query
+        name: topics
+        type: string
+      - description: Start time in YYYYMMDDTHHMM format
+        in: query
+        name: time_from
+        type: string
+      - description: End time in YYYYMMDDTHHMM format
+        in: query
+        name: time_to
+        type: string
+      - description: 'Sort order: LATEST, EARLIEST, or RELEVANCE'
+        in: query
+        name: sort
+        type: string
+      - description: 'Number of results (default: 50, max: 1000)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/alphavantage.NewsAndSentimentResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get news and sentiment data for specified parameters
+      tags:
+      - news
   /v1/timeseries/{symbol}:
     get:
       description: Returns time series data for the specified stock symbol
@@ -683,6 +729,71 @@ paths:
             additionalProperties: true
             type: object
       summary: Get time series data for a specific symbol
+      tags:
+      - timeseries
+  /v1/timeseries/{symbol}/{interval}:
+    get:
+      description: Returns intraday time series data with the specified interval
+      parameters:
+      - description: Stock symbol (e.g., AAPL, MSFT)
+        in: path
+        name: symbol
+        required: true
+        type: string
+      - description: Time interval for data
+        enum:
+        - 1min
+        - 5min
+        - 15min
+        - 30min
+        - 60min
+        in: path
+        name: interval
+        required: true
+        type: string
+      - default: compact
+        description: Amount of data to return
+        enum:
+        - compact
+        - full
+        in: query
+        name: outputsize
+        type: string
+      - default: json
+        description: Data type for response
+        enum:
+        - json
+        - csv
+        in: query
+        name: datatype
+        type: string
+      - default: false
+        description: Whether to include extended hours data
+        in: query
+        name: extended_hours
+        type: boolean
+      - default: true
+        description: Whether to adjust for split and dividend events
+        in: query
+        name: adjusted
+        type: boolean
+      - description: Month for historical intraday data (YYYY-MM format)
+        in: query
+        name: month
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/alphavantage.TimeSeriesResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get intraday time series data with specific interval
       tags:
       - timeseries
 schemes:

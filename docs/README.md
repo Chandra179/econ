@@ -1,11 +1,3 @@
-# Stock Market API Documentation
-
-This directory contains the Swagger documentation for the Stock Market API.
-
-## Overview
-
-The Stock Market API provides endpoints for retrieving time series data for various stock symbols.
-
 ## Files
 
 - `swagger.yaml` - OpenAPI 3.0 specification in YAML format

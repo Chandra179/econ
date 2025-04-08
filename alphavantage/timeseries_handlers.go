@@ -93,7 +93,7 @@ func GetTimeSeriesForSymbol(c *gin.Context) {
 // @Param month query string false "Month for historical intraday data (YYYY-MM format)"
 // @Success 200 {object} TimeSeriesResponse "Successful operation"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/timeseries/{symbol}/{interval} [get]
+// @Router /v1/timeseries/{symbol}/{interval} [get]
 func GetTimeSeriesWithInterval(c *gin.Context) {
 	symbol := c.Param("symbol")
 	interval := c.Param("interval")

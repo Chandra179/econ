@@ -86,6 +86,11 @@ func SetupRouter() *gin.Engine {
 			fundamental.GET("/income-statement/:symbol", alphavantage.GetIncomeStatement)
 			fundamental.GET("/company-overview/:symbol", alphavantage.GetCompanyOverview)
 		}
+		// News and sentiment endpoints
+		news := v1.Group("/news")
+		{
+			news.GET("/sentiment", alphavantage.GetNewsAndSentiment)
+		}
 	}
 
 	return router
