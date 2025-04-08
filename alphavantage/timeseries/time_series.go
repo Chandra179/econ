@@ -1,6 +1,7 @@
 package timeseries
 
 import (
+	"encoding/json"
 	"stock/common"
 	"stock/config"
 )
@@ -34,8 +35,36 @@ type TimeSeriesParams struct {
 	Month         string // For intraday historical data in YYYY-MM format
 }
 
+// TimeSeriesMetaData represents the Meta Data field in the API response
+type TimeSeriesMetaData struct {
+	Information   string `json:"1. Information"`
+	Symbol        string `json:"2. Symbol"`
+	LastRefreshed string `json:"3. Last Refreshed"`
+	Interval      string `json:"4. Interval"`
+	OutputSize    string `json:"5. Output Size"`
+	TimeZone      string `json:"6. Time Zone"`
+}
+
+// TimeSeriesData represents the data point structure for each timestamp
+type TimeSeriesData struct {
+	Open   string `json:"1. open"`
+	High   string `json:"2. high"`
+	Low    string `json:"3. low"`
+	Close  string `json:"4. close"`
+	Volume string `json:"5. volume"`
+}
+
+// TimeSeriesResponse represents the complete API response structure
+type TimeSeriesResponse struct {
+	MetaData    TimeSeriesMetaData        `json:"Meta Data"`
+	TimeSeries  map[string]TimeSeriesData `json:"Time Series (5min),omitempty"`
+	DailyData   map[string]TimeSeriesData `json:"Time Series (Daily),omitempty"`
+	WeeklyData  map[string]TimeSeriesData `json:"Weekly Time Series,omitempty"`
+	MonthlyData map[string]TimeSeriesData `json:"Monthly Time Series,omitempty"`
+}
+
 // GetTimeSeries fetches time series data from Alpha Vantage API
-func GetTimeSeries(params TimeSeriesParams) (map[string]interface{}, error) {
+func GetTimeSeries(params TimeSeriesParams) (*TimeSeriesResponse, error) {
 	// Get API configuration
 	cfg := config.GetConfig()
 
@@ -77,10 +106,16 @@ func GetTimeSeries(params TimeSeriesParams) (map[string]interface{}, error) {
 	}
 
 	// Make HTTP request and parse response
-	resp, err := common.MakeAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
+	respBody, err := common.GetAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
 	if err != nil {
 		return nil, err
 	}
+	defer respBody.Close()
 
-	return resp, nil
+	result := &TimeSeriesResponse{}
+	if err := json.NewDecoder(respBody).Decode(result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

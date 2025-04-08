@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"stock/alphavantage"
-	"stock/filereader"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -86,13 +85,6 @@ func SetupRouter() *gin.Engine {
 			fundamental.GET("/cash-flow/:symbol", alphavantage.GetCashFlow)
 			fundamental.GET("/income-statement/:symbol", alphavantage.GetIncomeStatement)
 			fundamental.GET("/company-overview/:symbol", alphavantage.GetCompanyOverview)
-		}
-
-		// File reader endpoints
-		fileReader := v1.Group("/filereader")
-		{
-			fileReader.POST("/upload", filereader.ReadFileFromUpload)
-			fileReader.POST("/readbytes", filereader.ReadFileFromBytes)
 		}
 	}
 

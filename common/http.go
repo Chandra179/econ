@@ -1,8 +1,7 @@
 package common
 
 import (
-	"encoding/json"
-	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 )
@@ -23,8 +22,13 @@ func BuildRequestURL(baseURL string, params map[string]string) (string, error) {
 	return u.String(), nil
 }
 
+// GetAPIRequest performs the Get HTTP request to an API and returns the parsed JSON response
+func GetAPIRequest(baseURL string, params map[string]string) (io.ReadCloser, error) {
+	return MakeAPIRequest(baseURL, params, "GET")
+}
+
 // MakeAPIRequest performs the HTTP request to an API and returns the parsed JSON response
-func MakeAPIRequest(baseURL string, params map[string]string) (map[string]interface{}, error) {
+func MakeAPIRequest(baseURL string, params map[string]string, apiMethod string) (io.ReadCloser, error) {
 	client := &http.Client{}
 
 	// Build URL with query parameters
@@ -34,7 +38,7 @@ func MakeAPIRequest(baseURL string, params map[string]string) (map[string]interf
 	}
 
 	// Create request
-	req, err := http.NewRequest("GET", fullURL, nil)
+	req, err := http.NewRequest(apiMethod, fullURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -44,18 +48,5 @@ func MakeAPIRequest(baseURL string, params map[string]string) (map[string]interf
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	// Parse JSON response
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
-	// Check for API error
-	if errorMsg, ok := result["Error Message"].(string); ok {
-		return nil, fmt.Errorf("API error: %s", errorMsg)
-	}
-
-	return result, nil
+	return resp.Body, nil
 }

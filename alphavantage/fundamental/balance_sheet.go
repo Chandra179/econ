@@ -1,6 +1,7 @@
 package fundamental
 
 import (
+	"encoding/json"
 	"stock/common"
 	"stock/config"
 )
@@ -72,92 +73,19 @@ func GetBalanceSheet(params BalanceSheetParams) (*BalanceSheetResponse, error) {
 	}
 
 	// Make HTTP request
-	resp, err := common.MakeAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
+	respBody, err := common.GetAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
 	if err != nil {
 		return nil, err
 	}
+	defer respBody.Close()
 
-	// Convert generic response to BalanceSheetResponse
+	// Decode JSON response into BalanceSheetResponse struct
 	balanceSheetResp := &BalanceSheetResponse{
 		Symbol: params.Symbol,
 	}
-
-	// Extract annual reports
-	if annualReports, ok := resp["annualReports"].([]interface{}); ok {
-		for _, report := range annualReports {
-			if reportMap, ok := report.(map[string]interface{}); ok {
-				balanceSheetReport := mapToBalanceSheetReport(reportMap)
-				balanceSheetResp.AnnualReports = append(balanceSheetResp.AnnualReports, balanceSheetReport)
-			}
-		}
-	}
-
-	// Extract quarterly reports
-	if quarterlyReports, ok := resp["quarterlyReports"].([]interface{}); ok {
-		for _, report := range quarterlyReports {
-			if reportMap, ok := report.(map[string]interface{}); ok {
-				balanceSheetReport := mapToBalanceSheetReport(reportMap)
-				balanceSheetResp.QuarterlyReports = append(balanceSheetResp.QuarterlyReports, balanceSheetReport)
-			}
-		}
+	if err := json.NewDecoder(respBody).Decode(balanceSheetResp); err != nil {
+		return nil, err
 	}
 
 	return balanceSheetResp, nil
-}
-
-// mapToBalanceSheetReport converts a map to a BalanceSheetReport struct
-func mapToBalanceSheetReport(reportMap map[string]interface{}) BalanceSheetReport {
-	report := BalanceSheetReport{}
-
-	// Helper function to safely extract string values
-	getString := func(m map[string]interface{}, key string) string {
-		if val, ok := m[key]; ok {
-			if strVal, ok := val.(string); ok {
-				return strVal
-			}
-		}
-		return ""
-	}
-
-	// Extract all fields
-	report.FiscalDateEnding = getString(reportMap, "fiscalDateEnding")
-	report.ReportedCurrency = getString(reportMap, "reportedCurrency")
-	report.TotalAssets = getString(reportMap, "totalAssets")
-	report.TotalCurrentAssets = getString(reportMap, "totalCurrentAssets")
-	report.CashAndCashEquivalentsAtCarryingValue = getString(reportMap, "cashAndCashEquivalentsAtCarryingValue")
-	report.CashAndShortTermInvestments = getString(reportMap, "cashAndShortTermInvestments")
-	report.Inventory = getString(reportMap, "inventory")
-	report.CurrentNetReceivables = getString(reportMap, "currentNetReceivables")
-	report.TotalNonCurrentAssets = getString(reportMap, "totalNonCurrentAssets")
-	report.PropertyPlantEquipment = getString(reportMap, "propertyPlantEquipment")
-	report.AccumulatedDepreciationAmortizationPPE = getString(reportMap, "accumulatedDepreciationAmortizationPPE")
-	report.IntangibleAssets = getString(reportMap, "intangibleAssets")
-	report.IntangibleAssetsExcludingGoodwill = getString(reportMap, "intangibleAssetsExcludingGoodwill")
-	report.Goodwill = getString(reportMap, "goodwill")
-	report.Investments = getString(reportMap, "investments")
-	report.LongTermInvestments = getString(reportMap, "longTermInvestments")
-	report.ShortTermInvestments = getString(reportMap, "shortTermInvestments")
-	report.OtherCurrentAssets = getString(reportMap, "otherCurrentAssets")
-	report.OtherNonCurrentAssets = getString(reportMap, "otherNonCurrentAssets")
-	report.TotalLiabilities = getString(reportMap, "totalLiabilities")
-	report.TotalCurrentLiabilities = getString(reportMap, "totalCurrentLiabilities")
-	report.CurrentAccountsPayable = getString(reportMap, "currentAccountsPayable")
-	report.DeferredRevenue = getString(reportMap, "deferredRevenue")
-	report.CurrentDebt = getString(reportMap, "currentDebt")
-	report.ShortTermDebt = getString(reportMap, "shortTermDebt")
-	report.TotalNonCurrentLiabilities = getString(reportMap, "totalNonCurrentLiabilities")
-	report.CapitalLeaseObligations = getString(reportMap, "capitalLeaseObligations")
-	report.LongTermDebt = getString(reportMap, "longTermDebt")
-	report.CurrentLongTermDebt = getString(reportMap, "currentLongTermDebt")
-	report.LongTermDebtNoncurrent = getString(reportMap, "longTermDebtNoncurrent")
-	report.ShortLongTermDebtTotal = getString(reportMap, "shortLongTermDebtTotal")
-	report.OtherCurrentLiabilities = getString(reportMap, "otherCurrentLiabilities")
-	report.OtherNonCurrentLiabilities = getString(reportMap, "otherNonCurrentLiabilities")
-	report.TotalShareholderEquity = getString(reportMap, "totalShareholderEquity")
-	report.TreasuryStock = getString(reportMap, "treasuryStock")
-	report.RetainedEarnings = getString(reportMap, "retainedEarnings")
-	report.CommonStock = getString(reportMap, "commonStock")
-	report.CommonStockSharesOutstanding = getString(reportMap, "commonStockSharesOutstanding")
-
-	return report
 }

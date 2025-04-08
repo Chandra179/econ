@@ -52,36 +52,11 @@ definitions:
     description: Time series response data structure
     properties:
       data:
-        additionalProperties: true
-        type: object
+        $ref: '#/definitions/timeseries.TimeSeriesResponse'
       interval:
         type: string
       symbol:
         type: string
-      timestamp:
-        type: string
-      version:
-        type: string
-    type: object
-  filereader.FileReadResponse:
-    description: File read response data structure
-    properties:
-      columnsMax:
-        type: integer
-      data:
-        items:
-          items:
-            type: string
-          type: array
-        type: array
-      error:
-        type: string
-      fileType:
-        type: string
-      filename:
-        type: string
-      rowsCount:
-        type: integer
       timestamp:
         type: string
       version:
@@ -438,6 +413,55 @@ definitions:
       symbol:
         type: string
     type: object
+  timeseries.TimeSeriesData:
+    properties:
+      1. open:
+        type: string
+      2. high:
+        type: string
+      3. low:
+        type: string
+      4. close:
+        type: string
+      5. volume:
+        type: string
+    type: object
+  timeseries.TimeSeriesMetaData:
+    properties:
+      1. Information:
+        type: string
+      2. Symbol:
+        type: string
+      3. Last Refreshed:
+        type: string
+      4. Interval:
+        type: string
+      5. Output Size:
+        type: string
+      6. Time Zone:
+        type: string
+    type: object
+  timeseries.TimeSeriesResponse:
+    properties:
+      Meta Data:
+        $ref: '#/definitions/timeseries.TimeSeriesMetaData'
+      Monthly Time Series:
+        additionalProperties:
+          $ref: '#/definitions/timeseries.TimeSeriesData'
+        type: object
+      Time Series (5min):
+        additionalProperties:
+          $ref: '#/definitions/timeseries.TimeSeriesData'
+        type: object
+      Time Series (Daily):
+        additionalProperties:
+          $ref: '#/definitions/timeseries.TimeSeriesData'
+        type: object
+      Weekly Time Series:
+        additionalProperties:
+          $ref: '#/definitions/timeseries.TimeSeriesData'
+        type: object
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -515,93 +539,6 @@ paths:
       summary: Get intraday time series data with specific interval
       tags:
       - timeseries
-  /v1/filereader/readbytes:
-    post:
-      consumes:
-      - application/octet-stream
-      description: Reads and parses file data (CSV or PDF) from the request body and
-        returns structured data
-      parameters:
-      - description: File type (csv or pdf)
-        enum:
-        - csv
-        - pdf
-        in: query
-        name: fileType
-        required: true
-        type: string
-      - description: Original filename (for reference only)
-        in: query
-        name: filename
-        type: string
-      - description: Raw file content
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: integer
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/filereader.FileReadResponse'
-        "400":
-          description: Bad request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Read and parse file data from request body
-      tags:
-      - filereader
-  /v1/filereader/upload:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Reads and parses an uploaded file (CSV or PDF) and returns structured
-        data
-      parameters:
-      - description: File to be parsed
-        in: formData
-        name: file
-        required: true
-        type: file
-      - description: File type (csv or pdf)
-        enum:
-        - csv
-        - pdf
-        in: query
-        name: fileType
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            $ref: '#/definitions/filereader.FileReadResponse'
-        "400":
-          description: Bad request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Read and parse an uploaded file
-      tags:
-      - filereader
   /v1/fundamental/balance-sheet/{symbol}:
     get:
       description: Returns the balance sheet data for the specified stock symbol

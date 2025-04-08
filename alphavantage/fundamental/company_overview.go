@@ -1,13 +1,10 @@
 package fundamental
 
 import (
+	"encoding/json"
 	"stock/common"
 	"stock/config"
 )
-
-/*
-	sector, industry, per, ebitda, eps
-*/
 
 // CompanyOverviewParams holds parameters for retrieving company overview data
 type CompanyOverviewParams struct {
@@ -88,81 +85,19 @@ func GetCompanyOverview(params CompanyOverviewParams) (*CompanyOverviewResponse,
 	}
 
 	// Make HTTP request
-	resp, err := common.MakeAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
+	respBody, err := common.GetAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
 	if err != nil {
 		return nil, err
 	}
+	defer respBody.Close()
 
 	// Convert generic response to CompanyOverviewResponse
 	overview := &CompanyOverviewResponse{
-		Symbol:                     getString(resp, "Symbol"),
-		Name:                       getString(resp, "Name"),
-		Description:                getString(resp, "Description"),
-		Exchange:                   getString(resp, "Exchange"),
-		Currency:                   getString(resp, "Currency"),
-		Country:                    getString(resp, "Country"),
-		Sector:                     getString(resp, "Sector"),
-		Industry:                   getString(resp, "Industry"),
-		Address:                    getString(resp, "Address"),
-		FiscalYearEnd:              getString(resp, "FiscalYearEnd"),
-		LatestQuarter:              getString(resp, "LatestQuarter"),
-		MarketCapitalization:       getString(resp, "MarketCapitalization"),
-		EBITDA:                     getString(resp, "EBITDA"),
-		PERatio:                    getString(resp, "PERatio"),
-		PEGRatio:                   getString(resp, "PEGRatio"),
-		BookValue:                  getString(resp, "BookValue"),
-		DividendPerShare:           getString(resp, "DividendPerShare"),
-		DividendYield:              getString(resp, "DividendYield"),
-		EPS:                        getString(resp, "EPS"),
-		RevenuePerShareTTM:         getString(resp, "RevenuePerShareTTM"),
-		ProfitMargin:               getString(resp, "ProfitMargin"),
-		OperatingMarginTTM:         getString(resp, "OperatingMarginTTM"),
-		ReturnOnAssetsTTM:          getString(resp, "ReturnOnAssetsTTM"),
-		ReturnOnEquityTTM:          getString(resp, "ReturnOnEquityTTM"),
-		RevenueTTM:                 getString(resp, "RevenueTTM"),
-		GrossProfitTTM:             getString(resp, "GrossProfitTTM"),
-		DilutedEPSTTM:              getString(resp, "DilutedEPSTTM"),
-		QuarterlyEarningsGrowthYOY: getString(resp, "QuarterlyEarningsGrowthYOY"),
-		QuarterlyRevenueGrowthYOY:  getString(resp, "QuarterlyRevenueGrowthYOY"),
-		AnalystTargetPrice:         getString(resp, "AnalystTargetPrice"),
-		TrailingPE:                 getString(resp, "TrailingPE"),
-		ForwardPE:                  getString(resp, "ForwardPE"),
-		PriceToSalesRatioTTM:       getString(resp, "PriceToSalesRatioTTM"),
-		PriceToBookRatio:           getString(resp, "PriceToBookRatio"),
-		EVToRevenue:                getString(resp, "EVToRevenue"),
-		EVToEBITDA:                 getString(resp, "EVToEBITDA"),
-		Beta:                       getString(resp, "Beta"),
-		WeekHigh52:                 getString(resp, "52WeekHigh"),
-		WeekLow52:                  getString(resp, "52WeekLow"),
-		DayMovingAverage50:         getString(resp, "50DayMovingAverage"),
-		DayMovingAverage200:        getString(resp, "200DayMovingAverage"),
-		SharesOutstanding:          getString(resp, "SharesOutstanding"),
-		SharesFloat:                getString(resp, "SharesFloat"),
-		SharesShort:                getString(resp, "SharesShort"),
-		SharesShortPriorMonth:      getString(resp, "SharesShortPriorMonth"),
-		ShortRatio:                 getString(resp, "ShortRatio"),
-		ShortPercentOutstanding:    getString(resp, "ShortPercentOutstanding"),
-		ShortPercentFloat:          getString(resp, "ShortPercentFloat"),
-		PercentInsiders:            getString(resp, "PercentInsiders"),
-		PercentInstitutions:        getString(resp, "PercentInstitutions"),
-		ForwardAnnualDividendRate:  getString(resp, "ForwardAnnualDividendRate"),
-		ForwardAnnualDividendYield: getString(resp, "ForwardAnnualDividendYield"),
-		PayoutRatio:                getString(resp, "PayoutRatio"),
-		DividendDate:               getString(resp, "DividendDate"),
-		ExDividendDate:             getString(resp, "ExDividendDate"),
-		LastSplitFactor:            getString(resp, "LastSplitFactor"),
-		LastSplitDate:              getString(resp, "LastSplitDate"),
+		Symbol: params.Symbol,
+	}
+	if err := json.NewDecoder(respBody).Decode(overview); err != nil {
+		return nil, err
 	}
 
 	return overview, nil
-}
-
-// Helper function to safely extract string values from the response map
-func getString(data map[string]interface{}, key string) string {
-	if val, ok := data[key]; ok {
-		if strVal, ok := val.(string); ok {
-			return strVal
-		}
-	}
-	return ""
 }

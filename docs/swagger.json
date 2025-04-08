@@ -111,131 +111,6 @@
                 }
             }
         },
-        "/v1/filereader/readbytes": {
-            "post": {
-                "description": "Reads and parses file data (CSV or PDF) from the request body and returns structured data",
-                "consumes": [
-                    "application/octet-stream"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "filereader"
-                ],
-                "summary": "Read and parse file data from request body",
-                "parameters": [
-                    {
-                        "enum": [
-                            "csv",
-                            "pdf"
-                        ],
-                        "type": "string",
-                        "description": "File type (csv or pdf)",
-                        "name": "fileType",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Original filename (for reference only)",
-                        "name": "filename",
-                        "in": "query"
-                    },
-                    {
-                        "description": "Raw file content",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/filereader.FileReadResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/filereader/upload": {
-            "post": {
-                "description": "Reads and parses an uploaded file (CSV or PDF) and returns structured data",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "filereader"
-                ],
-                "summary": "Read and parse an uploaded file",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "File to be parsed",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "enum": [
-                            "csv",
-                            "pdf"
-                        ],
-                        "type": "string",
-                        "description": "File type (csv or pdf)",
-                        "name": "fileType",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/filereader.FileReadResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/v1/fundamental/balance-sheet/{symbol}": {
             "get": {
                 "description": "Returns the balance sheet data for the specified stock symbol",
@@ -529,50 +404,13 @@
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "object",
-                    "additionalProperties": true
+                    "$ref": "#/definitions/timeseries.TimeSeriesResponse"
                 },
                 "interval": {
                     "type": "string"
                 },
                 "symbol": {
                     "type": "string"
-                },
-                "timestamp": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
-        "filereader.FileReadResponse": {
-            "description": "File read response data structure",
-            "type": "object",
-            "properties": {
-                "columnsMax": {
-                    "type": "integer"
-                },
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "error": {
-                    "type": "string"
-                },
-                "fileType": {
-                    "type": "string"
-                },
-                "filename": {
-                    "type": "string"
-                },
-                "rowsCount": {
-                    "type": "integer"
                 },
                 "timestamp": {
                     "type": "string"
@@ -1109,6 +947,81 @@
                 },
                 "symbol": {
                     "type": "string"
+                }
+            }
+        },
+        "timeseries.TimeSeriesData": {
+            "type": "object",
+            "properties": {
+                "1. open": {
+                    "type": "string"
+                },
+                "2. high": {
+                    "type": "string"
+                },
+                "3. low": {
+                    "type": "string"
+                },
+                "4. close": {
+                    "type": "string"
+                },
+                "5. volume": {
+                    "type": "string"
+                }
+            }
+        },
+        "timeseries.TimeSeriesMetaData": {
+            "type": "object",
+            "properties": {
+                "1. Information": {
+                    "type": "string"
+                },
+                "2. Symbol": {
+                    "type": "string"
+                },
+                "3. Last Refreshed": {
+                    "type": "string"
+                },
+                "4. Interval": {
+                    "type": "string"
+                },
+                "5. Output Size": {
+                    "type": "string"
+                },
+                "6. Time Zone": {
+                    "type": "string"
+                }
+            }
+        },
+        "timeseries.TimeSeriesResponse": {
+            "type": "object",
+            "properties": {
+                "Meta Data": {
+                    "$ref": "#/definitions/timeseries.TimeSeriesMetaData"
+                },
+                "Monthly Time Series": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/timeseries.TimeSeriesData"
+                    }
+                },
+                "Time Series (5min)": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/timeseries.TimeSeriesData"
+                    }
+                },
+                "Time Series (Daily)": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/timeseries.TimeSeriesData"
+                    }
+                },
+                "Weekly Time Series": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/timeseries.TimeSeriesData"
+                    }
                 }
             }
         }

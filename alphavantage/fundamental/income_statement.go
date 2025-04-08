@@ -2,9 +2,7 @@ package fundamental
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+	"stock/common"
 	"stock/config"
 )
 
@@ -54,41 +52,26 @@ type IncomeStatementReport struct {
 func GetIncomeStatement(params IncomeStatementParams) (*IncomeStatementResponse, error) {
 	cfg := config.GetConfig()
 
-	// Build request URL
-	url := fmt.Sprintf("%s/query?function=INCOME_STATEMENT&symbol=%s&apikey=%s",
-		cfg.AlphaVantageBaseURL,
-		params.Symbol,
-		cfg.AlphaVantageAPIKey)
-
-	// Make the request
-	resp, err := http.Get(url)
+	// Building query parameters
+	queryParams := map[string]string{
+		"function": "INCOME_STATEMENT",
+		"symbol":   params.Symbol,
+		"apikey":   cfg.AlphaVantageAPIKey,
+	}
+	// Make HTTP request
+	respBody, err := common.GetAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
 	if err != nil {
-		return nil, fmt.Errorf("error making request to Alpha Vantage: %w", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
-
-	// Check for error messages in the response
-	var errorResponse map[string]interface{}
-	if err := json.Unmarshal(body, &errorResponse); err == nil {
-		if errorMsg, exists := errorResponse["Error Message"]; exists {
-			return nil, fmt.Errorf("API error: %v", errorMsg)
-		}
-		if errorMsg, exists := errorResponse["Information"]; exists {
-			return nil, fmt.Errorf("API information: %v", errorMsg)
-		}
-	}
+	defer respBody.Close()
 
 	// Parse the response
-	var result IncomeStatementResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("error parsing income statement data: %w", err)
+	result := &IncomeStatementResponse{
+		Symbol: params.Symbol,
+	}
+	if err := json.NewDecoder(respBody).Decode(result); err != nil {
+		return nil, err
 	}
 
-	return &result, nil
+	return result, nil
 }

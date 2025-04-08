@@ -1,6 +1,7 @@
 package fundamental
 
 import (
+	"encoding/json"
 	"stock/common"
 	"stock/config"
 )
@@ -63,83 +64,19 @@ func GetCashFlow(params CashFlowParams) (*CashFlowResponse, error) {
 	}
 
 	// Make HTTP request
-	resp, err := common.MakeAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
+	respBody, err := common.GetAPIRequest(cfg.AlphaVantageBaseURL, queryParams)
 	if err != nil {
 		return nil, err
 	}
+	defer respBody.Close()
 
 	// Convert generic response to CashFlowResponse
 	cashFlowResp := &CashFlowResponse{
 		Symbol: params.Symbol,
 	}
-
-	// Extract annual reports
-	if annualReports, ok := resp["annualReports"].([]interface{}); ok {
-		for _, report := range annualReports {
-			if reportMap, ok := report.(map[string]interface{}); ok {
-				cashFlowReport := mapToCashFlowReport(reportMap)
-				cashFlowResp.AnnualReports = append(cashFlowResp.AnnualReports, cashFlowReport)
-			}
-		}
-	}
-
-	// Extract quarterly reports
-	if quarterlyReports, ok := resp["quarterlyReports"].([]interface{}); ok {
-		for _, report := range quarterlyReports {
-			if reportMap, ok := report.(map[string]interface{}); ok {
-				cashFlowReport := mapToCashFlowReport(reportMap)
-				cashFlowResp.QuarterlyReports = append(cashFlowResp.QuarterlyReports, cashFlowReport)
-			}
-		}
+	if err := json.NewDecoder(respBody).Decode(cashFlowResp); err != nil {
+		return nil, err
 	}
 
 	return cashFlowResp, nil
-}
-
-// mapToCashFlowReport converts a map to a CashFlowReport struct
-func mapToCashFlowReport(reportMap map[string]interface{}) CashFlowReport {
-	report := CashFlowReport{}
-
-	// Helper function to safely extract string values
-	getString := func(m map[string]interface{}, key string) string {
-		if val, ok := m[key]; ok {
-			if strVal, ok := val.(string); ok {
-				return strVal
-			}
-		}
-		return ""
-	}
-
-	// Extract all fields
-	report.FiscalDateEnding = getString(reportMap, "fiscalDateEnding")
-	report.ReportedCurrency = getString(reportMap, "reportedCurrency")
-	report.OperatingCashflow = getString(reportMap, "operatingCashflow")
-	report.PaymentsForOperatingActivities = getString(reportMap, "paymentsForOperatingActivities")
-	report.ProceedsFromOperatingActivities = getString(reportMap, "proceedsFromOperatingActivities")
-	report.ChangeInOperatingLiabilities = getString(reportMap, "changeInOperatingLiabilities")
-	report.ChangeInOperatingAssets = getString(reportMap, "changeInOperatingAssets")
-	report.DepreciationDepletionAndAmortization = getString(reportMap, "depreciationDepletionAndAmortization")
-	report.CapitalExpenditures = getString(reportMap, "capitalExpenditures")
-	report.ChangeInReceivables = getString(reportMap, "changeInReceivables")
-	report.ChangeInInventory = getString(reportMap, "changeInInventory")
-	report.ProfitLoss = getString(reportMap, "profitLoss")
-	report.CashflowFromInvestment = getString(reportMap, "cashflowFromInvestment")
-	report.CashflowFromFinancing = getString(reportMap, "cashflowFromFinancing")
-	report.ProceedsFromRepaymentsOfShortTermDebt = getString(reportMap, "proceedsFromRepaymentsOfShortTermDebt")
-	report.PaymentsForRepurchaseOfCommonStock = getString(reportMap, "paymentsForRepurchaseOfCommonStock")
-	report.PaymentsForRepurchaseOfEquity = getString(reportMap, "paymentsForRepurchaseOfEquity")
-	report.PaymentsForRepurchaseOfPreferredStock = getString(reportMap, "paymentsForRepurchaseOfPreferredStock")
-	report.DividendPayout = getString(reportMap, "dividendPayout")
-	report.DividendPayoutCommonStock = getString(reportMap, "dividendPayoutCommonStock")
-	report.DividendPayoutPreferredStock = getString(reportMap, "dividendPayoutPreferredStock")
-	report.ProceedsFromIssuanceOfCommonStock = getString(reportMap, "proceedsFromIssuanceOfCommonStock")
-	report.ProceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet = getString(reportMap, "proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet")
-	report.ProceedsFromIssuanceOfPreferredStock = getString(reportMap, "proceedsFromIssuanceOfPreferredStock")
-	report.ProceedsFromRepurchaseOfEquity = getString(reportMap, "proceedsFromRepurchaseOfEquity")
-	report.ProceedsFromSaleOfTreasuryStock = getString(reportMap, "proceedsFromSaleOfTreasuryStock")
-	report.ChangeInCashAndCashEquivalents = getString(reportMap, "changeInCashAndCashEquivalents")
-	report.ChangeInExchangeRate = getString(reportMap, "changeInExchangeRate")
-	report.NetIncome = getString(reportMap, "netIncome")
-
-	return report
 }

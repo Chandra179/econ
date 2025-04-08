@@ -26,11 +26,11 @@ type TimeSeriesParams struct {
 // TimeSeriesResponse defines the response format for time series data
 // @Description Time series response data structure
 type TimeSeriesResponse struct {
-	Version   string                 `json:"version"`
-	Timestamp string                 `json:"timestamp"`
-	Symbol    string                 `json:"symbol"`
-	Interval  string                 `json:"interval,omitempty"`
-	Data      map[string]interface{} `json:"data"`
+	Version   string                         `json:"version"`
+	Timestamp string                         `json:"timestamp"`
+	Symbol    string                         `json:"symbol"`
+	Interval  string                         `json:"interval,omitempty"`
+	Data      *timeseries.TimeSeriesResponse `json:"data"`
 }
 
 // GetTimeSeriesForSymbol handles requests for time series data for a specific symbol
@@ -151,7 +151,7 @@ func GetTimeSeriesWithInterval(c *gin.Context) {
 }
 
 // getTimeSeriesData fetches time series data from Alpha Vantage API
-func getTimeSeriesData(params TimeSeriesParams) (map[string]interface{}, error) {
+func getTimeSeriesData(params TimeSeriesParams) (*timeseries.TimeSeriesResponse, error) {
 	// Convert API params to stock package params
 	stockParams := timeseries.TimeSeriesParams{
 		Function:      params.Function,
